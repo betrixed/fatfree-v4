@@ -409,7 +409,7 @@ class Image {
 			return FALSE;
 		}
 		$fw=Base::instance();
-		foreach ($fw->split($path?:$fw->UI.';./') as $dir)
+		foreach (Loader::split($path?:$fw->UI.';./') as $dir)
 			if (is_file($path=$dir.$font)) {
 				$seed=strtoupper(substr(
 					$ssl?bin2hex(openssl_random_pseudo_bytes($len)):uniqid(),
@@ -590,7 +590,7 @@ class Image {
 			$this->file=$file;
 			if (!isset($path))
 				$path=$fw->UI.';./';
-			foreach ($fw->split($path,FALSE) as $dir)
+			foreach (Loader::split($path,FALSE) as $dir)
 				if (is_file($dir.$file))
 					return $this->load($fw->read($dir.$file));
 			user_error(self::E_File,E_USER_ERROR);

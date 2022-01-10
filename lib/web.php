@@ -685,7 +685,7 @@ class Web extends Prefab {
 	function minify($files,$mime=NULL,$header=TRUE,$path=NULL) {
 		$fw=Base::instance();
 		if (is_string($files))
-			$files=$fw->split($files);
+			$files=Loader::split($files);
 		if (!$mime)
 			$mime=$this->mime($files[0]);
 		preg_match('/\w+$/',$files[0],$ext);
@@ -693,7 +693,7 @@ class Web extends Prefab {
 		$dst='';
 		if (!isset($path))
 			$path=$fw->UI.';./';
-		foreach (array_unique($fw->split($path,FALSE)) as $dir)
+		foreach (array_unique(Loader::split($path,FALSE)) as $dir)
 			foreach ($files as $i=>$file)
 				if (is_file($save=$fw->fixslashes($dir.$file)) &&
 					is_bool(strpos($save,'../')) &&

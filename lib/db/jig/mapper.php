@@ -239,7 +239,7 @@ class Mapper extends \DB\Cursor {
 				);
 			}
 			if (isset($options['group'])) {
-				$cols=array_reverse($fw->split($options['group']));
+				$cols=array_reverse(Loader::split($options['group']));
 				// sort into groups
 				$data=$this->sort($data,$options['group']);
 				foreach($data as $i=>&$row) {
@@ -310,7 +310,7 @@ class Mapper extends \DB\Cursor {
 	*	@return mixed
 	*/
 	protected function sort($data,$cond) {
-		$cols=\Base::instance()->split($cond);
+		$cols= Loader::split($cond);
 		uasort(
 			$data,
 			function($val1,$val2) use($cols) {

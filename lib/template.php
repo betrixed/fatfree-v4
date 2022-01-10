@@ -77,7 +77,7 @@ class Template extends Preview {
 					(preg_match('/^\{\{(.+?)\}\}$/',$attrib['href'])?
 						$this->token($attrib['href']):
 						Base::instance()->stringify($attrib['href'])).','.
-					'NULL,'.$hive.','.$ttl.'); ?>');
+					$hive.','.$ttl.'); ?>');
 	}
 
 	/**

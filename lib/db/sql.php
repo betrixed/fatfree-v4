@@ -396,7 +396,7 @@ class SQL {
 				'FIELD','TYPE','DEFVAL','NULLABLE','Y','PKEY','P']
 		];
 		if (is_string($fields))
-			$fields=\Base::instance()->split($fields);
+			$fields=Loader::split($fields);
 		$conv=[
 			'int\b|integer'=>\PDO::PARAM_INT,
 			'bool'=>\PDO::PARAM_BOOL,

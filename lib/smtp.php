@@ -271,7 +271,7 @@ class SMTP extends Magic {
 		unset($headers['Sender']);
 		// Start message dialog
 		$this->dialog('MAIL FROM: '.$from,$log,$mock);
-		foreach ($fw->split($headers['To'].
+		foreach (Loader::split($headers['To'].
 			(isset($headers['Cc'])?(';'.$headers['Cc']):'').
 			(isset($headers['Bcc'])?(';'.$headers['Bcc']):'')) as $dst) {
 			$this->dialog('RCPT TO: '.strstr($dst,'<'),$log,$mock);

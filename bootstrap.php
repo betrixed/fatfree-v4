@@ -1,6 +1,11 @@
 <?php
 
 // Kickstart the framework
+use DB\SQL;
+use WC\{WConfig, Services};
+
+chdir(__DIR__);
+
 $f3=require('lib/base.php');
 
 $f3->set('DEBUG',1);
@@ -10,8 +15,30 @@ if ((float)PCRE_VERSION<8.0)
 // Load configuration
 $f3->config('config.ini');
 
-$f3->route('GET /',
-	function($f3) {
+
+$gApp = new WConfig();
+$gApp->show_time = true;
+
+new Services($gApp);
+
+function setup_album_services(Base $f3) {
+    $services = Services::instance();
+    
+    $services->setShared('db',function($sql) use ($f3) {
+        return new SQL($f3->get('DB'));
+    });
+    
+    $f3->route('GET /album', 'Album\Controller->indexGet');
+}
+    
+setup_album_services($f3);
+
+
+
+// A welcome page function / factory
+$welcome_page = function($f3) {
+    global $gApp;
+    
 		$classes=array(
 			'Base'=>
 				array(
@@ -74,15 +101,18 @@ $f3->route('GET /',
 				array('pcntl')
 		);
 		$f3->set('classes',$classes);
-		$f3->set('content','welcome.htm');
-		echo View::instance()->render('layout.htm');
-	}
-);
+		$f3->set('content','welcome.phtml');
+                $gApp->render_time = microtime(true);
+		echo View::instance()->render('layout.phtml');
+	};
+
+$f3->route('GET /', $welcome_page);
+$f3->route('GET /index.php', $welcome_page);
 
 $f3->route('GET /userref',
 	function($f3) {
-		$f3->set('content','userref.htm');
-		echo View::instance()->render('layout.htm');
+		$f3->set('content','userref.phtml');
+		echo View::instance()->render('layout.phtml');
 	}
 );
 

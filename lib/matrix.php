@@ -47,7 +47,7 @@ class Matrix extends Prefab {
 	 */
 	function select($fields, $data) {
 		return array_intersect_key(is_array($data) ? $data : \Base::instance()->get($data),
-			array_flip(is_array($fields) ? $fields : \Base::instance()->split($fields)));
+			array_flip(is_array($fields) ? $fields : Loader::split($fields)));
 	}
 
 	/**

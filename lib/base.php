@@ -21,11 +21,9 @@
 */
 
 /**
- * Base cannot load prior to configuring a loader
+ * Base cannot load prior to configuring F3 loader
  */
 require_once __DIR__ . "/loader.php";
-
-$loader = new Loader("./" );
 
 //! Base structure
 final class Base extends Prefab implements ArrayAccess {
@@ -2077,6 +2075,10 @@ final class Base extends Prefab implements ArrayAccess {
 				}
 			}
 		}
+                // update AUTOLOAD if it exists
+                if ($this->exists('AUTOLOAD')) {
+                    Loader::instance()->set_autoload($this->get('AUTOLOAD'));
+                }
 		return $this;
 	}
 
@@ -2492,6 +2494,7 @@ final class Base extends Prefab implements ArrayAccess {
 			'URI'=>&$_SERVER['REQUEST_URI'],
 			'VERB'=>&$_SERVER['REQUEST_METHOD'],
 			'VERSION'=>self::VERSION,
+                        'VIEW_INJECT' => ['ENCODING','PACKAGE', 'SCHEME', 'HOST', 'PORT', 'BASE', 'VERSION', 'TIME'],
 			'XFRAME'=>'SAMEORIGIN'
 		];
 		if (!headers_sent() && session_status()!=PHP_SESSION_ACTIVE) {

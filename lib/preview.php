@@ -175,7 +175,7 @@ class Preview extends View {
 	*	@param $hive array
 	*	@param $ttl int
 	**/
-	function render($file,$mime='text/html',array $hive=NULL,$ttl=0) {
+	function render($file,array $inject=NULL,$ttl=0) {
 		$fw=$this->fw;
 		$cache=Cache::instance();
 		if (!is_dir($tmp=$fw->TEMP))
@@ -198,7 +198,7 @@ class Preview extends View {
 					!headers_sent() && session_status()!=PHP_SESSION_ACTIVE)
 					session_start();
 				$fw->sync('SESSION');
-				$data=$this->sandbox($hive,$mime);
+				$data=$this->sandbox($inject);
 				if(isset($this->trigger['afterrender']))
 					foreach ($this->trigger['afterrender'] as $func)
 						$data=$fw->call($func, [$data, $view]);

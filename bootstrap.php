@@ -100,10 +100,15 @@ $welcome_page = function($f3) {
 			'CLI\WS'=>
 				array('pcntl')
 		);
-		$f3->set('classes',$classes);
-		$f3->set('content','welcome.phtml');
+
                 $gApp->render_time = microtime(true);
-		echo View::instance()->render('layout.phtml');
+                $view = View::instance();
+                
+                echo $view->render('layout.phtml', [
+                    'content' => 
+                     $view->render('welcome.phtml',['classes' => $classes])
+                ]);
+
 	};
 
 $f3->route('GET /', $welcome_page);

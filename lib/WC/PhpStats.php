@@ -46,6 +46,7 @@ class PhpStats {
         $files = get_included_files();
 
         $out = "<br><pre><br>";
+        $out .= "PHP version " . PHP_VERSION . PHP_EOL;
         $opc = '';
         if ($conf) {
             if ($details) {

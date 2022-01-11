@@ -1,3 +1,31 @@
+This v4.0 repository is experimental. It fatfree v3.7 could still be improved, and suggest ways to start to untangle the Base class.
+
+### Changes made:
+
+Seperate base.php into all of its seperate class files. It can be done.
+To do this created a seperate Loader class in loader.php, Method autoload deleted from Base.
+Base instance methods split() and fixslashes() changed into static methods of Loader.
+All usages update Base::instance()->split($x) changed to Loader::split($x)
+
+Include the Loader class and bootstrap it from base.php with require_once, so that the standard bootstrap of fatfree works as before as require(lib/base.php).
+Add a few more diagnostic statistics.
+
+Take the $mime argument out of View->render. Global hive property MIME. 
+Replace with view property and method access override, of global MIME.
+Add VIEW_INJECTION key to hive. A list of hive variables to inject into view.
+Initialize VIEW_INJECTION to values used in the welcome.htm layout.
+Changed ".htm" extensions to ".phtml" extensions, because of PHP code syntax highlighting.
+Rename ui folder as a public "public" folder. Move lib/code.css to public/css.
+Add a .htaccess file to public, for convenience of Apache.
+
+Do not call View->esc to recurse on copy of the entire hive, during render preparation.
+I presume this was nice for the Template class. Taken this out of View->render.
+
+
+### Suggestions
+Need some more tests and usage validation.
+Template views compile to actual php files cache.
+
 [![Fat-Free Framework](ui/images/logo.png)](http://fatfree.sf.net/)
 
 **A powerful yet easy-to-use PHP micro-framework designed to help you build dynamic and robust Web applications - fast!**

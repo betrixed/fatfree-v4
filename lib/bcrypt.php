@@ -23,7 +23,7 @@
 *	Lightweight password hashing library (PHP 5.5+ only)
 *	@deprecated Use http://php.net/manual/en/ref.password.php instead
 **/
-class Bcrypt extends Prefab {
+class Bcrypt  {
 
 	//@{ Error messages
 	const
@@ -42,6 +42,16 @@ class Bcrypt extends Prefab {
 	*	@param $salt string
 	*	@param $cost int
 	**/
+        
+        private static $i_me = null;
+        
+        public static function instance() {
+            if (self::$i_me === null) {
+                self::$i_me = new Bcrypt();
+            }
+            return self::$i_me;
+        }
+        
 	function hash($pw,$salt=NULL,$cost=self::COST) {
 		if ($cost<4 || $cost>31)
 			user_error(self::E_CostArg,E_USER_ERROR);

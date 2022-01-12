@@ -21,7 +21,7 @@
 */
 
 //! Cache-based session handler
-class Session {
+final class Session {
 
 	protected
 		//! Session ID

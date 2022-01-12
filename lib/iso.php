@@ -2,7 +2,7 @@
 
 
 //! ISO language/country codes
-class ISO extends Prefab {
+final class ISO {
 
 	//@{ ISO 3166-1 country codes
 	const
@@ -344,6 +344,14 @@ class ISO extends Prefab {
 		LC_zh='Chinese';
 	//@}
 
+        private static $i_me = null;
+        public static function instance() {
+            if (self::$i_me === null) {
+                self::$i_me = new ISO();
+            }
+            return self::$i_me;
+        }
+        
 	/**
 	*	Return list of languages indexed by ISO 639-1 language code
 	*	@return array

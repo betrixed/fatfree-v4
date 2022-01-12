@@ -21,7 +21,7 @@
 */
 
 //! Wrapper for various HTTP utilities
-class Web extends Prefab {
+final class Web {
 
 	//@{ Error messages
 	const
@@ -32,12 +32,22 @@ class Web extends Prefab {
 		//! HTTP request engine
 		$wrapper;
 
+        private static $i_me = null;
+        public static function instance() {
+            if (self::$i_me === null) {
+                self::$i_me = new Web();
+            }
+            return self::$i_me;
+        }
+        
 	/**
 	*	Detect MIME type using file extension or file inspection
 	*	@return string
 	*	@param $file string
 	*	@param $inspect bool
 	**/
+        
+        
 	function mime($file, $inspect=FALSE) {
 		if ($inspect) {
 			if (is_file($file) && is_readable($file)) {

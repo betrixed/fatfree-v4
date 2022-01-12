@@ -21,7 +21,7 @@
 */
 
 //! Generic array utilities
-class Matrix extends Prefab {
+final class Matrix {
 
 	/**
 	*	Retrieve values from a specified column of a multi-dimensional

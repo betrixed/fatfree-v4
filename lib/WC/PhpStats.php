@@ -15,7 +15,7 @@ class PhpStats {
         return number_format(($b - $a)*1000.0,2);
     }
     
-    static public function mem_MB(int $bytes) : string {
+    static public function mem_MB(float $bytes) : string {
         return number_format($bytes / self::SIZE_MB, 3);
     }
     static public function preTable(array $data): string {
@@ -97,7 +97,7 @@ class PhpStats {
         $total = $hit_count + $miss_count;
         $out .= "Included files total $total, opcached = $hit_count\n";
         $out .= "File cache memory total = " . self::mem_MB($file_mem) . " MB\n";
-        $out .= "Average file = " .  self::mem_MB($file_mem/$total) . " MB\n";
+        $out .= "Average file = " .  self::mem_MB((float) $file_mem/$total) . " MB\n";
         $out .= $opc;
         $out .= "</pre><br>\n";
         return $out;

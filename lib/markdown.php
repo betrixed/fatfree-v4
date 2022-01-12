@@ -21,8 +21,9 @@
 */
 
 //! Markdown-to-HTML converter
-class Markdown extends Prefab {
+final class Markdown {
 
+        
 	protected
 		//! Parsing rules
 		$blocks,
@@ -34,6 +35,14 @@ class Markdown extends Prefab {
 	*	@return string
 	*	@param $str string
 	**/
+        
+        private static $i_me = null;
+        public static function instance() {
+            if (self::$i_me === null) {
+                self::$i_me = new Markdown();
+            }
+            return self::$i_me;
+        }
 	protected function _blockquote($str) {
 		$str=preg_replace('/(?<=^|\n)\h?>\h?(.*?(?:\n+|$))/','\1',$str);
 		return strlen($str)?

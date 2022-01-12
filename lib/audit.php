@@ -21,7 +21,7 @@
 */
 
 //! Data validator
-class Audit extends Prefab {
+final class Audit  {
 
 	//@{ User agents
 	const
@@ -29,7 +29,13 @@ class Audit extends Prefab {
 		UA_Desktop='bsd|linux|os\s+[x9]|solaris|windows',
 		UA_Bot='bot|crawl|slurp|spider';
 	//@}
-
+        private static $i_me = null;
+        public static function instance() {
+            if (self::$i_me === null) {
+                self::$i_me = new Audit();
+            }
+            return self::$i_me;
+        }
 	/**
 	*	Return TRUE if string is a valid URL
 	*	@return bool

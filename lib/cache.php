@@ -2,7 +2,7 @@
 
 
 //! Cache engine
-class Cache extends Prefab {
+final class Cache  {
 
 	protected
 		//! Cache DSN
@@ -11,7 +11,14 @@ class Cache extends Prefab {
 		$prefix,
 		//! MemCache or Redis object
 		$ref;
-
+        private static $i_me = null;
+        
+        public static function instance() {
+            if (self::$i_me === null) {
+                self::$i_me = new Cache();
+            }
+            return self::$i_me;
+        }
 	/**
 	*	Return timestamp and TTL of cache entry or FALSE if not found
 	*	@return array|FALSE

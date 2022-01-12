@@ -21,8 +21,15 @@
 */
 
 //! Unicode string manager
-class UTF extends Prefab {
+final class UTF {
 
+        private static $i_me = null;
+        public static function instance() {
+            if (self::$i_me === null) {
+                self::$i_me = new UTF();
+            }
+            return self::$i_me;
+        }
 	/**
 	*	Get string length
 	*	@return int

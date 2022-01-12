@@ -21,7 +21,7 @@
 */
 
 //! Image manipulation tools
-class Image {
+final class Image {
 
 	//@{ Messages
 	const
@@ -52,6 +52,13 @@ class Image {
 		//! Filter count
 		$count=0;
 
+        private static $i_me = null;
+        public static function instance() {
+            if (self::$i_me === null) {
+                self::$i_me = new Audit();
+            }
+            return self::$i_me;
+        }
 	/**
 	*	Convert RGB hex triad to array
 	*	@return array|FALSE

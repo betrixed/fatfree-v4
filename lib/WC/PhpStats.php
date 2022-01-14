@@ -7,7 +7,7 @@
 
 namespace WC;
 
-use stdClass;
+use Base;
 
 class PhpStats {
     const SIZE_MB = 1024.0 * 1024.0;
@@ -104,8 +104,9 @@ class PhpStats {
     }
     
 
-    static public function end_stats(stdClass $obj) : string
+    static public function end_stats() : string
     {
+        $obj = Base::instance();
         $mem1 = (float) memory_get_peak_usage();
         $mem2 = (float) memory_get_peak_usage(true);
         $show_time = $obj->show_time ?? null;

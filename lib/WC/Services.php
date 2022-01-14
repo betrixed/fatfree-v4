@@ -3,25 +3,19 @@
 namespace WC {
 
 final class Services {
-    private array $shared;
-    private array $coded;
-    public WConfig $app;
     
-    static private $static_i;
+    static private $i_me = null;
 
     public static function instance() {
-        return self::$static_i;
-    }
-    public function __construct(WConfig $app) {
-        $this->shared = [];
-        $this->coded = [];
-        $this->app = $app;
-        $app->services = $this;
-        if (self::$static_i === null)  {
-            self::$static_i = $this;
+        if (!self::$i_me) {
+            self::$i_me = new Services();
         }
-        $this->coded['container'] = $this;
-        $this->shared['container'] = $this;
+        return self::$i_me;
+    }
+    public function __construct(
+        private array $shared = [],
+        private array $coded = [])
+    {
     }
     
     public function has(string $name) : bool

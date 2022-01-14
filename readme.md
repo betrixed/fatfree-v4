@@ -1,30 +1,50 @@
-This v4.0 repository is experimental. It fatfree v3.7 could still be improved, and suggest ways to start to untangle the Base class.
+This v4.0 repository is experimental, and requires PHP >= 8.1  
+Fatfree v3.7 could still be improved. 
+Many of the changes could be back-ported for FatFree v3.8 and PHP 5.4
 
-### Changes made:
+### Changes made so far:
 
-Seperate base.php into all of its seperate class files. It can be done.
-To do this created a seperate Loader class in loader.php, Method autoload deleted from Base.
-Base instance methods split() and fixslashes() changed into static methods of Loader.
-All usages update Base::instance()->split($x) changed to Loader::split($x)
+#### Code Review
 
-Include the Loader class and bootstrap it from base.php with require_once, so that the standard bootstrap of fatfree works as before as require(lib/base.php).
-Add a few more diagnostic statistics.
+- Gradually adding PHP 8.1 type specifications to functions, methods and properties.
+- Rewrite of base Route code, to work out what it does.
+- Handler class created for Route information. 
+- Hive array ROUTES pattern index to Handler objects.
+- emoved the alphabet sort of ROUTES by uri pattern. 
+- Routes are for now searched in the order appended.
+- Added #[\ReturnTypeWillChange] to ArrayAccess implementation methods
 
-Take the $mime argument out of View->render. Global hive property MIME. 
-Replace with view property and method access override, of global MIME.
-Add VIEW_INJECTION key to hive. A list of hive variables to inject into view.
-Initialize VIEW_INJECTION to values used in the welcome.htm layout.
-Changed ".htm" extensions to ".phtml" extensions, because of PHP code syntax highlighting.
-Rename ui folder as a public "public" folder. Move lib/code.css to public/css.
-Add a .htaccess file to public, for convenience of Apache.
+#### Class reorganization
 
-Do not call View->esc to recurse on copy of the entire hive, during render preparation.
-I presume this was nice for the Template class. Taken this out of View->render.
+- Seperated the classes in base.php into seperate class files.
+- Created a seperate Loader class in loader.php, autoload method deleted from Base.
+- Base instance methods split() and fixslashes() exist now as static methods of Loader.
+- Deprecated methods split() and fixslashes() call the Loader static methods.
+- Changed all Base::instance()->split($x) into Loader::split($x)
 
+#### API Changes
+- Added Base->prefix to complement Base->concat
+- Ripped the $mime argument out of View->render parameters.
+- View render will use hive property MIME. Override with instance property mime()
+- Add VIEW_INJECT hive key, list of hive properties to extract() into view.
+- Initialized VIEW_INJECT to values used in the welcome.htm layout.
+- Deleted call to View-esc($hive) from View->render. 
+
+#### File path and Folder Changes
+- Change ".htm" exampls to ".phtml" extension, as more PHP specific.
+- Renamed ui folder as "public" folder. 
+- Move lib/code.css to public/css.
+- Put a .htaccess file to public, for Apache convenience.
+
+#### Usage example classes
+- New namespace WC for Web Class additions
+- Added a Dependency Injection class and mixin for Services
+- WC\BaseController
 
 ### Suggestions
-Need some more tests and usage validation.
-Template views compile to actual php files cache.
+- Need some regression and validation tests.
+- Every time something changes, something else will break.
+
 
 [![Fat-Free Framework](ui/images/logo.png)](http://fatfree.sf.net/)
 

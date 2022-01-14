@@ -129,7 +129,7 @@ class Loader {
      * @param type $class
      * @return mixed
      */
-    protected function autoload($class) {
+    public function autoload($class) {
             $class=self::fixslashes(ltrim($class,'\\'));
             
             $paths = $this->get_paths();

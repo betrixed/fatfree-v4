@@ -217,7 +217,7 @@ final class Base implements ArrayAccess {
      * 	@return array
      * 	@param $str string
      * */
-    function parse($str)
+    public static function parse($str)
     {
         preg_match_all('/(\w+|\*)\h*=\h*(?:\[(.+?)\]|(.+?))(?=,|$)/',
                 $str, $pairs, PREG_SET_ORDER);
@@ -653,7 +653,7 @@ final class Base implements ArrayAccess {
      */
     function &prefix(string $key, string $val) : string {
         $ref = &$this->ref($key);
-        $ref = $val . $key;
+        $ref = $val . $ref;
         return $ref;
     }
     /**
@@ -1519,7 +1519,7 @@ final class Base implements ArrayAccess {
                 user_error(sprintf(self::E_Named, $parts[2]), E_USER_ERROR);
             $parts[4] = $this->hive['ALIASES'][$parts[2]];
             $parts[4] = $this->build($parts[4],
-                    isset($parts[3]) ? $this->parse($parts[3]) : []);
+                    isset($parts[3]) ? self::parse($parts[3]) : []);
         }
         if (empty($parts[4]))
             user_error(sprintf(self::E_Pattern, $pattern), E_USER_ERROR);
@@ -1557,7 +1557,7 @@ final class Base implements ArrayAccess {
     function alias($name, $params = [], $query = NULL, $fragment = NULL)
     {
         if (!is_array($params))
-            $params = $this->parse($params);
+            $params = self::parse($params);
         if (empty($this->hive['ALIASES'][$name]))
             user_error(sprintf(self::E_Named, $name), E_USER_ERROR);
         $url = $this->build($this->hive['ALIASES'][$name], $params);
@@ -1618,45 +1618,28 @@ final class Base implements ArrayAccess {
         foreach (Loader::split($parts[1]) as $verb)
         {
             $uverb = strtoupper($verb);
-
-            if (!preg_match('/' . self::VERBS . '/', $uverb))
+            $flag = Route::$requestTypes[$uverb] ?? 0;
+            if (!$flag)
             {
                 $this->error(501, $verb . ' ' . $this->hive['URI']);
             }
-
             $verbs[] = $uverb;
         }
+
+        $vset = count($verbs) > 1 ? $verbs : $verbs[0];
+        $robj = new Route($p3, $vset, $type, $target, $ttl, $kbps, $alias);
+        
         $ra = &$this->hive['ROUTES'];
         $empty = !isset($ra[$p3]);
         if ($empty)
         {
-            $ra[$p3] = [];
+            $ra[$p3] = $robj;
+           
         }
-
-        $ref = &$ra[$p3];
-
-        if (!empty($verbs))
-        {
-            $vset = count($verbs) > 1 ? $verbs : $verbs[0];
-            foreach ($ref as $obj)
-            {
-                if ($obj->type === $type)
-                {
-                    if ($obj->hasVerb($verb))
-                    {
-                        $this->error(501, $verb . ' route exists ' . $this->hive['URI']);
-                    } else
-                    {
-                        $obj->addVerb($verb);
-                    }
-                    return;
-                }
-            }
-        } else
-        {
-            $vset = [];
+        else {
+            $occupy = $ra[$p3];
+            $ra[$p3] = [$occupy, $robj];
         }
-        $ref[] = new Handler($p3, $vset, $type, $target, $ttl, $kbps, $alias);
     }
 
     /**
@@ -1675,7 +1658,7 @@ final class Base implements ArrayAccess {
         elseif (preg_match('/^(?:@([^\/()?#]+)(?:\((.+?)\))*(\?[^#]+)*(#.+)*)/',
                         $url, $parts) && isset($this->hive['ALIASES'][$parts[1]]))
             $url = $this->build($this->hive['ALIASES'][$parts[1]],
-                            isset($parts[2]) ? $this->parse($parts[2]) : []) .
+                            isset($parts[2]) ? self::parse($parts[2]) : []) .
                     (isset($parts[3]) ? $parts[3] : '') . (isset($parts[4]) ? $parts[4] : '');
         else
             $url = $this->build($url);
@@ -1850,7 +1833,10 @@ final class Base implements ArrayAccess {
     {
         $routes = $this->hive['ROUTES'];
         $verb = $this->hive['VERB'];
-
+        $vbits = Route::$requestTypes[$verb] ?? 0;
+        if (!$vbits) {
+            Route::badVerb($verb);
+        }
         $paths = [];
         //$keys = array_keys($routes);
         //$vals = array_values($routes);
@@ -1862,7 +1848,7 @@ final class Base implements ArrayAccess {
 
         list($cors, $preflight) = $this->sendCORS();
         $icase = $this->hive['CASELESS'] ? 'i' : '';
-
+        // leaving off sorting for now
         /* foreach ($keys as $key)
         {
             $path = preg_replace('/@\w+/', '*@', $key);
@@ -1880,7 +1866,7 @@ final class Base implements ArrayAccess {
         $search = $routes;
         $req = urldecode($this->hive['PATH']);
         $i = 0;
-        foreach ($search as $pattern => $routes)
+        foreach ($routes as $pattern => $rtest)
         {
             $args = self::mask_url($pattern, $req, $icase);
             if (empty($args))
@@ -1891,19 +1877,20 @@ final class Base implements ArrayAccess {
 
 
             $handler = null;
-            foreach ($routes as $route)
-            {
-                $htype = $route->type;
+            $check = is_array($rtest) ? $rtest : [$rtest];
 
+            foreach ($check as $rh)
+            {
+                $htype = $rh->type;
                 if (($htype !== $reqType) && ($htype !== self::REQ_UNKN))
                 {
                     continue;
                 }
-                $allowed[] = $route;
+                $allowed[] = $rh;
 
-                if ($route->hasVerb($verb))
+                if (($rh->verbits & $vbits) != 0)
                 {
-                    $handler = $route;
+                    $handler = $rh;
                     break;
                 }
             }
@@ -1911,7 +1898,7 @@ final class Base implements ArrayAccess {
             if (!$preflight)
             {
                 // GET path has length > 1 and ends with '/'
-                if ($verb === 'GET' && (strlen($path) > 1) && (substr($path, -1, 1) === '/'))
+                if (($vbits === Route::REQ_GET) && (strlen($path) > 1) && (substr($path, -1, 1) === '/'))
                 {
                     $spath = substr($path, 0, -1);
                     if (!empty($query))

@@ -14,13 +14,18 @@ class BaseController {
     public function __construct() {
         $this->setGlobalDI();
     }
-    
-    public function prefixUI(string $path) {
+    /**
+     * Ensure directory path is searched first.
+     * Append end DIRECTORY_SEPARATOR if missing.
+     * @return string  Reference to the hive UI value
+     * @param string $path
+     */
+    public function &prefixUI(string $path) : string
+    {
         if (strrpos($path, DIRECTORY_SEPARATOR) !== strlen($path)-2) {
             $path .= DIRECTORY_SEPARATOR;
         }
         $f3 = $this->f3;
-        $f3->prefix('UI', $path . ";");
-
+        return $f3->prefix('UI', $path . ";");
     }
 }

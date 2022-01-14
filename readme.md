@@ -7,16 +7,16 @@ Many of the changes could be back-ported for FatFree v3.8 and PHP 5.4
 #### Code Review
 
 - Gradually adding PHP 8.1 type specifications to functions, methods and properties.
-- Rewrite of base Route code, to work out what it does.
-- Handler class created for Route information. 
-- Hive array ROUTES pattern index to Handler objects.
-- emoved the alphabet sort of ROUTES by uri pattern. 
+- Rewrite of base Route code, to clarify the data flow.
+- Route class created for Route information. Route has bit flags support multiple request verbs.
+- Hive array ROUTES pattern string is index to one Route object or array of Route objects.
+- removed the alphabet sort of ROUTES by uri pattern. 
 - Routes are for now searched in the order appended.
 - Added #[\ReturnTypeWillChange] to ArrayAccess implementation methods
 
 #### Class reorganization
 
-- Seperated the classes in base.php into seperate class files.
+- Seperated the classes in base.php into their several seperate class files.
 - Created a seperate Loader class in loader.php, autoload method deleted from Base.
 - Base instance methods split() and fixslashes() exist now as static methods of Loader.
 - Deprecated methods split() and fixslashes() call the Loader static methods.

@@ -6,7 +6,7 @@ use WC\BaseController;
 use Base,
     View;
 
-class IndexController extends BaseController {
+class Index extends BaseController {
 
     public function index(Base $f3)
     {

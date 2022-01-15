@@ -6,7 +6,7 @@ namespace WC;
  * @author michael
  */
 use WC\Mixin\PropertyService;
-
+use Loader;
 
 class BaseController {
     use PropertyService;
@@ -22,10 +22,8 @@ class BaseController {
      */
     public function &prefixUI(string $path) : string
     {
-        if (strrpos($path, DIRECTORY_SEPARATOR) !== strlen($path)-2) {
-            $path .= DIRECTORY_SEPARATOR;
-        }
+        
         $f3 = $this->f3;
-        return $f3->prefix('UI', $path . ";");
+        return $f3->prefix('UI', Loader::fix_path($path) . ";");
     }
 }

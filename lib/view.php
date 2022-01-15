@@ -135,10 +135,12 @@ class View extends Prefab {
     function render($file, array $inject = NULL, $ttl = 0) {
         $fw = $this->fw;
         $cache = Cache::instance();
-        foreach (Loader::split($fw->UI) as $dir) {
-            if ($cache->exists($hash = $fw->hash($dir . $file), $data))
+        foreach (Loader::path_list($fw->UI) as $dir) {
+            $fid = $dir . $file;
+            if ($cache->exists($hash = $fw->hash($fid), $data))
                 return $data;
-            if (is_file($this->file = $fw->fixslashes($dir . $file))) {
+            if (is_file($fid)) {
+                $this->file = $fid;
                 if (isset($_COOKIE[session_name()]) &&
                         !headers_sent() && session_status() != PHP_SESSION_ACTIVE)
                     session_start();
@@ -146,7 +148,7 @@ class View extends Prefab {
                 $data = $this->sandbox($inject);
                 if (isset($this->trigger['afterrender']))
                     foreach ($this->trigger['afterrender'] as $func)
-                        $data = $fw->call($func, [$data, $dir . $file]);
+                        $data = $fw->call($func, [$data, $fid]);
                 if ($ttl)
                     $cache->set($hash, $data, $ttl);
                 return $data;

@@ -885,7 +885,7 @@ final class Base implements ArrayAccess {
      * 	@return string
      * 	@param $str
      * */
-    function hash($str)
+    function hash(string $str) : string
     {
         return str_pad(base_convert(
                         substr(sha1($str), -16), 16, 36), 11, '0', STR_PAD_LEFT);
@@ -1311,10 +1311,10 @@ final class Base implements ArrayAccess {
             header('X-Content-Type-Options: nosniff');
             if ($this->hive['VERB'] == 'GET' && $secs)
             {
-                $time = microtime(TRUE);
+                $time =  time(); // unix timestamp
                 header_remove('Pragma');
                 header('Cache-Control: max-age=' . $secs);
-                header('Expires: ' . gmdate('r', $time + floatval($secs)));
+                header('Expires: ' . gmdate('r', $time + $secs));
                 header('Last-Modified: ' . gmdate('r'));
             } else
             {
@@ -1845,7 +1845,15 @@ final class Base implements ArrayAccess {
 
         $query = $this->hive['QUERY'];
         $path = $this->hive['PATH'];
-
+        $module = "/" . $this->hive['MODULE'];
+        if (str_starts_with($path, $module))
+        {
+            $path = substr($path, strlen($module)+1);
+            if (empty($path)) {
+                $path = "/";
+            }
+        }
+        
         list($cors, $preflight) = $this->sendCORS();
         $icase = $this->hive['CASELESS'] ? 'i' : '';
         // leaving off sorting for now
@@ -1864,7 +1872,7 @@ final class Base implements ArrayAccess {
          */
         //$search = array_combine($keys, $vals);
         $search = $routes;
-        $req = urldecode($this->hive['PATH']);
+        $req = urldecode($path);
         $i = 0;
         foreach ($routes as $pattern => $rtest)
         {
@@ -2368,42 +2376,50 @@ final class Base implements ArrayAccess {
                         foreach (['lval', 'rval'] as $ndx)
                             $match[$ndx] = $preview->
                                     resolve($match[$ndx], NULL, 0, FALSE, FALSE);
+                    $lval = $match['lval'];
+                    $rval = $match['rval'];
+                    
                     if (!empty($cmd))
                     {
                         isset($cmd[3]) ?
                                         $this->call($cmd[3],
-                                                [$match['lval'], $match['rval'], $cmd[2]]) :
+                                                [$lval, $lval, $cmd[2]]) :
                                         call_user_func_array(
                                                 [$this, $cmd[1]],
-                                                array_merge([$match['lval']],
+                                                array_merge([$lval],
                                                         str_getcsv($cmd[1] == 'config' ?
-                                                                        $this->cast($match['rval']) :
-                                                                        $match['rval']))
+                                                                        $this->cast($rval) :
+                                                                        $rval))
                         );
                     } else
                     {
                         $rval = preg_replace(
-                                '/\\\\\h*(\r?\n)/', '\1', $match['rval']);
+                                '/\\\\\h*(\r?\n)/', '\1', $rval);
                         $ttl = NULL;
                         if (preg_match('/^(.+)\|\h*(\d+)$/', $rval, $tmp))
                         {
                             array_shift($tmp);
                             list($rval, $ttl) = $tmp;
                         }
-                        $args = array_map(
-                                function ($val) {
-                                    $val = $this->cast($val);
-                                    if (is_string($val))
-                                        $val = strlen($val) ?
-                                                preg_replace('/\\\\"/', '"', $val) :
-                                                NULL;
-                                    return $val;
-                                },
-                                // Mark quoted strings with 0x00 whitespace
-                                str_getcsv(preg_replace(
-                                                '/(?<!\\\\)(")(.*?)\1/',
-                                                "\\1\x00\\2\\1", trim($rval)))
-                        );
+                        if (!empty($rval)) {
+                            $args = array_map(
+                                    function ($val) {
+                                        $val = $this->cast($val);
+                                        if (is_string($val))
+                                            $val = strlen($val) ?
+                                                    preg_replace('/\\\\"/', '"', $val) :
+                                                    NULL;
+                                        return $val;
+                                    },
+                                    // Mark quoted strings with 0x00 whitespace
+                                    str_getcsv(preg_replace(
+                                                    '/(?<!\\\\)(")(.*?)\1/',
+                                                    "\\1\x00\\2\\1", trim($rval)))
+                            );
+                        }
+                        else {
+                            $args = [false];
+                        }
                         preg_match('/^(?<section>[^:]+)(?:\:(?<func>.+))?/',
                                 $sec, $parts);
                         $func = isset($parts['func']) ? $parts['func'] : NULL;
@@ -2419,7 +2435,7 @@ final class Base implements ArrayAccess {
                                 array_merge(
                                         [
                                             ($custom ? ($parts['section'] . '.') : '') .
-                                            $match['lval']
+                                            $lval
                                         ],
                                         $args
                                 )
@@ -2882,7 +2898,7 @@ final class Base implements ArrayAccess {
             'VERSION' => self::VERSION,
             'VIEW_INJECT' => [
                     'ENCODING', 'PACKAGE', 'SCHEME', 'HOST', 'PORT', 
-                    'BASE', 'VERSION', 'TIME'],
+                    'BASE', 'VERSION', 'TIME', 'WUI'],
             'XFRAME' => 'SAMEORIGIN'
         ];
         if (!headers_sent() && session_status() != PHP_SESSION_ACTIVE)

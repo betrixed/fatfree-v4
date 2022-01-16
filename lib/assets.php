@@ -110,6 +110,10 @@ class Assets {
 				if ($asset['origin']=='inline')
 					return sprintf('<style type="text/css">%s</style>',$asset['data']);
 				$path = $asset['path'];
+                                $base = $f3->get('WEBROOT');
+                                if ($base && str_starts_with($path, $base)) {
+                                    $path = substr($path,strlen($base));
+                                }
 				unset($asset['path'],$asset['origin'],$asset['type'],
 					$asset['exclude'],$asset['slot']);
 				$params=$self->resolveAttr($asset+[
@@ -566,13 +570,18 @@ class Assets {
 			$this->assets[$group][$type][$priority][]=$asset;
 			return;
 		}
-		foreach ($this->f3->split($this->f3->get('UI')) as $dir)
-			if (is_file($view=$this->f3->fixslashes($dir.$path))) {
-				$asset['path']=ltrim($view,'./');
-				$asset['origin']='internal';
-				$this->assets[$group][$type][$priority][]=$asset;
-				return;
-			}
+                $paths = Loader::path_list($this->f3->get('UI'));
+		foreach ($paths as $dir) 
+                {
+                    $view = Loader::join($dir,$path);
+                    if (is_file($view) )
+                    {
+                            $asset['path']=ltrim($view,'./');
+                            $asset['origin']='internal';
+                            $this->assets[$group][$type][$priority][]=$asset;
+                            return;
+                    }
+                }
 		// file not found
 		if ($handler=$this->f3->get('ASSETS.onFileNotFound'))
 			$this->f3->call($handler,[$path,$this]);

@@ -168,6 +168,7 @@ class Mapper extends \DB\Cursor {
 		$fw=\Base::instance();
 		$cache=\Cache::instance();
 		$db=$this->db;
+                
 		$now=microtime(TRUE);
 		$data=[];
 		$tag='';

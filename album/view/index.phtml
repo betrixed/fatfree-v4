@@ -1,6 +1,6 @@
 <?php
 // module/Album/view/album/album/index.phtml:
-    global $gApp;
+
 ?>
 <h1><?= $this->esc($title) ?></h1>
 <p>
@@ -26,6 +26,6 @@
 </table>
 
         <p>
-            <?= WC\PhpStats::end_stats($gApp); ?><br>
+            <?= WC\PhpStats::end_stats(); ?><br>
             <?= WC\PhpStats::opcache(); ?>
         </p>

@@ -78,6 +78,11 @@ class View extends Prefab {
         }
     }
 
+    protected function clean_up() : string {
+         --$this->level;
+         $this->inject = null;
+         return ob_get_clean();
+    }
     /**
      * 	Create sandbox for template execution
      * 	@return string
@@ -97,16 +102,26 @@ class View extends Prefab {
         $this->inject = $inject;
         unset($fw, $hive);
 
+        set_error_handler(
+                function( $errno,  $errstr,  $errfile,  $errline)         
+                {
+                    //$view = View::instance();
+                    //$view->clean_up();
+                    return true;
+                });
         $this->hive_inject($inject);
         extract($inject);
         ++$this->level;
-        ob_start();
-        require($this->file);
-        --$this->level;
-
-        $this->inject = null;
-
-        return ob_get_clean();
+        
+        try {
+            ob_start();
+            require($this->file);
+        }
+        finally {
+            // ensure PHP output switching gets restored
+            restore_error_handler();
+            return $this->clean_up();
+        }
     }
 
     /**
@@ -146,11 +161,13 @@ class View extends Prefab {
                     session_start();
                 $fw->sync('SESSION');
                 $data = $this->sandbox($inject);
-                if (isset($this->trigger['afterrender']))
+                if (isset($this->trigger['afterrender'])) {
                     foreach ($this->trigger['afterrender'] as $func)
                         $data = $fw->call($func, [$data, $fid]);
-                if ($ttl)
+                }
+                if ($ttl)  {
                     $cache->set($hash, $data, $ttl);
+                }
                 return $data;
             }
         }

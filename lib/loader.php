@@ -65,6 +65,21 @@ class Loader {
         spl_autoload_register([$this, 'autoload']);
     }
 
+    /**
+     * Join directory to path, without doubling slash separator
+     * @param string $dir
+     * @param string $file
+     * @return string
+     */
+    public static function join(string $dir, string $file) : string
+    {
+        if (strpos($file,"/")===0) {
+            return self::endslash($dir) . substr($file,1);
+        }
+        else {
+            return self::endslash($dir) . $file;
+        }
+    }
     public static function instance(): Loader
     {
         if (!isset(self::$i_me))

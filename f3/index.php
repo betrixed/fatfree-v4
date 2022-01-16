@@ -10,7 +10,6 @@ class Index extends BaseController {
 
     public function index(Base $f3)
     {
-        $this->prefixUI("lib/F3");
 
         $classes = [
         'Base' => [
@@ -55,10 +54,11 @@ class Index extends BaseController {
 
         $f3->render_time = microtime(true);
         $view = View::instance();
-
+        $content = $view->render('welcome.phtml', ['classes' => $classes]);
+        
         echo $view->render('layout.phtml', [
-            'content' =>
-            $view->render('welcome.phtml', ['classes' => $classes])
+            'content' => $content
+            
         ]);
     }
 

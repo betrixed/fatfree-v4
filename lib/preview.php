@@ -175,42 +175,56 @@ class Preview extends View {
 	*	@param $hive array
 	*	@param $ttl int
 	**/
-	function render($file,array $inject=NULL,$ttl=0) {
-		$fw=$this->fw;
-		$cache=Cache::instance();
-		if (!is_dir($tmp=$fw->TEMP))
-			mkdir($tmp,Base::MODE,TRUE);
-		foreach (Loader::split($fw->UI) as $dir) {
-			if ($cache->exists($hash=$fw->hash($dir.$file),$data))
-				return $data;
-			if (is_file($view=$fw->fixslashes($dir.$file))) {
-				if (!is_file($this->file=($tmp.
-					$fw->SEED.'.'.$fw->hash($view).'.php')) ||
-					filemtime($this->file)<filemtime($view)) {
-					$contents=$fw->read($view);
-					if (isset($this->trigger['beforerender']))
-						foreach ($this->trigger['beforerender'] as $func)
-							$contents=$fw->call($func, [$contents, $view]);
-					$text=$this->parse($contents);
-					$fw->write($this->file,$this->build($text));
-				}
-				if (isset($_COOKIE[session_name()]) &&
-					!headers_sent() && session_status()!=PHP_SESSION_ACTIVE)
-					session_start();
-				$fw->sync('SESSION');
-				$data=$this->sandbox($inject);
-				if(isset($this->trigger['afterrender']))
-					foreach ($this->trigger['afterrender'] as $func)
-						$data=$fw->call($func, [$data, $view]);
-				if ($ttl)
-					$cache->set($hash,$data,$ttl);
-				return $data;
-			}
-		}
-		user_error(sprintf(Base::E_Open,$file),E_USER_ERROR);
-	}
+	function render($file, array $inject = NULL, $ttl = 0)
+    {
+        $fw = $this->fw;
+        $cache = Cache::instance();
+        if (!is_dir($tmp = $fw->TEMP))
+        {
+            mkdir($tmp, Base::MODE, TRUE);
+        }
 
-	/**
+
+        foreach (Loader::split($fw->UI) as $dir)
+        {
+            $view = Loader::fixslashes(Loader::endslash($dir) . $file);
+            if ($cache->exists($hash = $fw->hash($view), $data))
+                return $data;
+            if (is_file($view))
+            {
+                if (!is_file($this->file = ($tmp .
+                                $fw->SEED . '.' . $fw->hash($view) . '.php')) ||
+                        filemtime($this->file) <
+                        filemtime($view))
+                {
+                    $contents = $fw->read($view);
+                    if (isset($this->trigger['beforerender']))
+                        foreach ($this->trigger['beforerender'] as $func)
+                            $contents = $fw->call($func, [$contents, $view]);
+                    $text = $this->parse($contents);
+                    $fw->write($this->file, $this->build($text));
+                }
+                if (isset($_COOKIE[session_name()]) &&
+                        !headers_sent() &&
+                        session_status() !=
+                        PHP_SESSION_ACTIVE)
+                    session_start();
+                $fw->sync('SESSION');
+                $data = $this->sandbox($inject);
+                if (isset($this->trigger['afterrender']))
+                    foreach ($this->trigger['afterrender'] as $func)
+                        $data = $fw->call($func, [$data, $view]);
+                if ($ttl)
+                    $cache->set($hash, $data, $ttl);
+                return $data;
+            }
+        }
+
+
+        user_error(sprintf(Base::E_Open, $file), E_USER_ERROR);
+    }
+
+    /**
 	 *	post rendering handler
 	 *	@param $func callback
 	 */

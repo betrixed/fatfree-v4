@@ -1,0 +1,39 @@
+{
+    "5270220ebb01b0.93149557": {
+        "ACTIVE_DB": "JIG",
+        "DB_JIG": {
+            "dir": "app\/data\/",
+            "format": "0"
+        },
+        "DB_MYSQL": {
+            "user": "fatfree",
+            "password": "",
+            "host": "localhost",
+            "port": "3306",
+            "dbname": "fatfree"
+        },
+        "DB_SQLITE": {
+            "path": "app\/data\/fblog_sqlite.db"
+        },
+        "DB_PGSQL": {
+            "user": "fatfree",
+            "password": "fatfree",
+            "host": "localhost",
+            "dbname": "fatfree"
+        },
+        "DB_SQLSRV": {
+            "user": "fatfree",
+            "password": "fatfree",
+            "host": "LOCALHOST\\SQLEXPRESS2012",
+            "dbname": "fatfree"
+        },
+        "DB_MONGO": {
+            "host": "localhost",
+            "port": "27017",
+            "dbname": "fabulog"
+        },
+        "blog_title": "fabulog blogware",
+        "ssl_backend": false,
+        "auto_approve_comments": false
+    }
+}

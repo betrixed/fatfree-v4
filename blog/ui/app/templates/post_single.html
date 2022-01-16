@@ -1,0 +1,82 @@
+<article class="post-entry">
+    <header>
+        <h1>{{@post.title | esc}}</h1>
+        <p>
+            <span class="meta date"><i class="glyphicon glyphicon-calendar"></i> {{ '{0,date}', strtotime(@post.publish_date) | format }}</span>
+            <F3:check if="{{ @post.author }}">
+                <span class="meta"><i class="glyphicon glyphicon-user"></i> {{@post.author.name}}</span>
+            </F3:check>
+            <F3:check if="{{ @post.tags }}">
+            <span class="meta tags"><i class="glyphicon glyphicon-tag"></i>
+                <F3:repeat group="{{ @post.tags }}" value="{{ @tag }}">
+                    <a href="tag/{{ @tag.slug }}" class="badge">{{@tag.title | esc}}</a>
+                </F3:repeat>
+            </span>
+            </F3:check>
+        </p>
+    </header>
+    <hr/>
+    <F3:check if="{{ @post.teaser }}">
+        <div class="teaser-text">{{ @post.teaser | esc }}</div>
+    </F3:check>
+    <F3:check if="{{isset(@post.image) && @post.image}}">
+        <figure class="">
+            <a href="{{ @post.image }}" class="fancybox">
+            <f3:image src="{{@post.image}}" crop="false" width="300" height="200" alt="{{ @post.title | esc }}" class="thumbnail pull-left" />
+            </a>
+        </figure>
+    </F3:check>
+    <div class="bodytext clearfix">
+    {{@post.text}}
+    </div>
+    <F3:check if="{{ (isset(@post.enable_comments) && @post.enable_comments == 1) || !isset(@post.enable_comments) }}">
+    <aside>
+        <section id="comment-list">
+            <h3>Comments ({{ count(@post.comments?:[]) }})</h3>
+            <check if="{{ @post.comments }}">
+            <true>
+                <repeat group="{{ @post.comments }}" value="{{ @comment }}">
+                    <div class="comment well">
+                        <div class="author">{{ @comment.author_name | esc }} wrote on {{'{0,date}', strtotime(@comment.datetime) | format }}</div>
+                        <div class="message">{{ @comment.message | esc }}</div>
+                    </div>
+                </repeat>
+            </true>
+            <false>
+                No comments yet.
+            </false>
+            </check>
+        </section>
+
+        <h3 id="leave-a-comment">Leave a Comment</h3>
+        <form class="form-horizontal" role="form" action="{{ @post.slug }}#leave-a-comment" method="post">
+            <F3:repeat group="{{ \Flash::instance()->getMessages() }}" value="{{ @msg }}">
+                <div class="alert alert-{{ @msg.status }} alert-dismissable">
+                    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+                    {{ @msg.text | esc }}
+                </div>
+            </F3:repeat>
+            <div class="form-group {{@FLASH->getKey('error.model.comment.author_name')}}">
+                <div class="col-sm-5">
+                    <label for="input-name">Your name</label>
+                    <input type="text" name="author_name" class="form-control" id="input-name" />
+                </div>
+            </div>
+            <div class="form-group {{@FLASH->getKey('error.model.comment.author_email')}}">
+                <div class="col-sm-5">
+                    <label for="input-mail">Your email</label>
+                    <input type="email" name="author_email" class="form-control" id="input-mail" />
+                </div>
+            </div>
+            <div class="form-group {{@FLASH->getKey('error.model.comment.message')}}">
+                <div class="col-sm-12">
+                    <label for="input-text">Your message</label>
+                    <textarea class="form-control" name="message" id="input-text" placeholder="What are you thinking?" rows="6">{{isset(@POST.message)?@POST.message:'' | esc}}</textarea>
+                </div>
+            </div>
+            <button type="submit" class="btn btn-primary">Submit Comment</button>
+
+        </form>
+    </aside>
+    </F3:check>
+</article>

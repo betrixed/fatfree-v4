@@ -1,0 +1,65 @@
+<div class="col-sm-6">
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <h3 class="panel-title">Dashboard</h3>
+        </div>
+        <div class="panel-body">
+            <p>Hey, {{ @BACKEND_USER.name }}. This is <strong>fabulog v{{ @APP_VERSION }}</strong> ;)</p>
+            <p>fabulog is currently just a playground and demo blog application. It has the following features:</p>
+            <ul>
+                <li>It's powered by Fat-Free Framework {{ @VERSION }}!</li>
+                <li>Cortex ORM with Jig, SQL and Mongo database support</li>
+                <li>Post module with drafts and publishing by date</li>
+                <li>add Tags to Posts with auto-completion</li>
+                <li>Comment module with backend moderation</li>
+                <li>simple User management module</li>
+                <li>Twitter Bootstrap Backend, with Sommernote WYSIWYG editor</li>
+                <li>F3 FooForms plugin for handling all form data, yeah!</li>
+            </ul>
+        </div>
+    </div>
+</div>
+<div class="col-sm-6">
+    <F3:set error_data="{{!is_writeable('app/data')}}" />
+    <F3:set error_tmp="{{!is_writeable(@TEMP)}}" />
+    <F3:set error_res="{{!is_writeable(@UPLOADS)}}" />
+    <F3:check if="{{@error_data || @error_tmp || @error_res}}">
+        <div class="panel panel-danger">
+            <div class="panel-heading">
+                <h3 class="panel-title">System Check</h3>
+            </div>
+            <div class="panel-body">
+                <p> Please check the following notices:</p>
+                <ul>
+                <F3:check if="{{ @error_data }}">
+                    <li>The application data directoy <code>{{ @BASE }}/app/data</code> is not writeable!</li>
+                </F3:check>
+                <F3:check if="{{ @error_tmp }}">
+                    <li>The directory <code>{{ @BASE.'/'.@TEMP }}</code> for temporary files is not writeable!</li>
+                </F3:check>
+                <F3:check if="{{ @error_res }}">
+                    <li>The upload directory <code>{{ @BASE.'/'.@UPLOADS }}</code> is not writeable!</li>
+                </F3:check>
+                </ul>
+            </div>
+        </div>
+    </F3:check>
+    <F3:set new_comments="{{\Model\Comment::countNew()}}"/>
+    <div id="comment-widget" class="panel {{@new_comments>0?'panel-info':'panel-default'}}">
+        <div class="panel-heading">
+            <h3 class="panel-title">Comments</h3>
+        </div>
+        <div class="panel-body">
+            <F3:check if="{{ @new_comments > 0 }}">
+                <true>
+                    <p>
+                        You have <span class="label label-primary">{{ @new_comments }}</span> new comments, that needs your <a href="admin/comment">review</a>.
+                    </p>
+                </true>
+                <false>
+                    <p>You have no new comments</p>
+                </false>
+            </F3:check>
+        </div>
+    </div>
+</div>
